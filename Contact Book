@@ -1,0 +1,173 @@
+from tkinter import*
+from tkinter import messagebox
+from tkinter import ttk
+from PIL import Image, ImageTk
+import tkinter as tk
+
+root = Tk()
+root.geometry('1400x800')
+image = Image.open("C:/Users/utkar/OneDrive/Desktop/wp6944404.jpg")
+background_image = ImageTk.PhotoImage(image)
+background_label = Label(root, image=background_image)
+bg=background_label.place(relwidth=1, relheight=1)
+root.config(bg )
+root.title('My Contact Book')
+root.resizable(0,0)
+contactlist = [
+    ['Utkarsh','9688129902','utu187@gmail.com','Faridabad'],
+    ['Shubham Sharma', '8462979279','shubh287@gmail.com','Faridabad'],
+    ['Akash Kumar', '78971971909','aku387@gmail.com','Delhi'],
+    ['Nilesh Bhardwaj', '9896875187','nilesh487@gmail.com','Palwal'],
+    ['Bittu Rai', '8266899987','bitt587@gmail.com','jharkhand'],
+    ['Monika Rawat', '5269859731','monu687@gmail.com','Delhi'],
+    ['Meghama Das', '9798727991','meghu987@gmail.com','Faridabad'],
+    ['Sagar Kumar', '0170972978','sagar087@gmail.com','Delhi'],
+    ['Kushagra Kaushik','7297917969','kushu9287@gmail.com','Faridabad']
+    ]
+Name = StringVar()
+Number = StringVar()
+Email = StringVar()
+Address = StringVar()
+myframe = Frame(root)
+myframe.pack(side = RIGHT)
+ 
+scroll = Scrollbar(myframe, orient=VERTICAL)
+select = Listbox(myframe, yscrollcommand=scroll.set, font=('Times new roman' ,16), bg="#f0fffc", width=20, height=20, borderwidth=3, relief= "groove")
+scroll.config (command=select.yview)
+scroll.pack(side=RIGHT, fill=Y)
+select.pack(side=LEFT,  fill=BOTH, expand=1)
+def search():
+    root = tk.Tk()
+    root.title("Contacts Search")
+    def search_contacts():
+        search_term = search_entry.get()
+        results = []
+        for contact in contactlist:
+            if search_term.lower() in contact[0].lower() or search_term in contact[1] or search_term.lower() in contact[2].lower() or search_term.lower() in contact[3].lower():
+                results.append(contact)
+        update_results(results)
+
+    def update_results(results):
+        for row in results_tree.get_children():
+            results_tree.delete(row)
+        for contact in results:
+            results_tree.insert("", "end", values=(contact[0], contact[1], contact[2], contact[3]))
+
+    def close_window():
+        root.destroy()
+
+# Step 4: Design the GUI
+    
+    frame = ttk.Frame(root)
+    frame.pack(padx=10, pady=10, fill="x")
+
+    search_label = ttk.Label(frame, text="Search:")
+    search_label.pack(side="left")
+
+    search_entry = ttk.Entry(frame, width=30)
+    search_entry.pack(side="left", padx=(0, 10))
+
+    search_button = ttk.Button(frame, text="Search", command=search_contacts)
+    search_button.pack(side="left")
+
+    close_button = ttk.Button(root, text="Close Window", command=close_window)
+    close_button.pack(pady=20)
+
+
+
+# Display area for results
+    columns = ("Name", "Phone", "Email","Address")
+    results_tree = ttk.Treeview(root, columns=columns, show="headings")
+    for col in columns:
+        results_tree.heading(col, text=col)
+        results_tree.pack(fill="both", expand=True, padx=10, pady=10)
+    root.mainloop()
+ 
+def Selected():
+    print("entry",len(select.curselection()))
+    if len(select.curselection())==0:
+        messagebox.showerror("Error", "Please Select the Name")
+    else:
+        return int(select.curselection()[0])
+def AddContact():
+    if Name.get()!="" and Number.get()!="" and Email.get()!="" and Address.get()!="":
+        contactlist.append([Name.get() ,Number.get() ,Email.get() ,Address.get()])
+        print(contactlist)
+        Select_set()
+        EntryReset()
+        messagebox.showinfo("Confirmation", "Successfully Add New Contact")
+ 
+    else:
+        messagebox.showerror("Error","Please fill the information")
+ 
+def UpdateDetail():
+    if Name.get() and Number.get() and Email.get() and Address.get():
+        contactlist[Selected()] = [Name.get(), Number.get(), Email.get(), Address.get()]
+   
+        messagebox.showinfo("Confirmation", "Successfully Update Contact")
+        EntryReset()
+        Select_set()
+ 
+    elif not(Name.get()) and not(Number.get()) and not(Email.get()) and not(Address.get()) and not(len(select.curselection())==0):
+        messagebox.showerror("Error", "Please fill the information")
+ 
+    else:
+        if len(select.curselection())==0:
+            messagebox.showerror("Error", "Please Select the Name and \n press Load button")
+        else:
+            message1 = """To Load the all information of \n
+                          selected row press Load button\n.
+                          """
+            messagebox.showerror("Error", message1)
+        
+def Delete_Entry():
+    if len(select.curselection())!=0:
+        result=messagebox.askyesno('Confirmation','You Want to Delete Contact\n Which you selected')
+        if result==True:
+            del contactlist[Selected()]
+            Select_set()
+    else:
+        messagebox.showerror("Error", 'Please select the Contact')
+ 
+def VIEW():
+    NAME, PHONE, EMAIL, ADDRESS = contactlist[Selected()]
+    Name.set(NAME)
+    Number.set(PHONE)
+    Email.set(EMAIL)
+    Address.set(ADDRESS)
+
+def EXIT():
+    root.destroy() 
+ 
+def Select_set() :
+    contactlist.sort()
+    select.delete(0,END)
+    for name,phone,email,address in contactlist :
+        select.insert (END, name)
+Select_set()
+
+def EntryReset() :
+    select.delete(0, END)
+    for name,phone,email,address in contactlist :
+        select.insert(END,name)
+    
+    contactlist.sort()
+
+Label(root, text = 'Name', font=("Bookman Old Style",22,"bold")).place(x= 30, y=30)
+Entry(root, textvariable = Name, width=30).place(x= 300, y=40)
+Label(root, text = 'Contact Number.', font=("Bookman Old Style",20,"bold")).place(x= 30, y=80)
+Entry(root, textvariable = Number, width=30).place(x= 300, y=90)
+Label(root, text = 'Email Address', font=("Bookman Old Style",22,"bold"), bg = 'white',activebackground= bg).place(x= 30, y=130)
+Entry(root, textvariable = Email, width=30).place(x= 300, y=140)
+Label(root, text = 'Location', font=("Bookman Old Style",22,"bold")).place(x= 30, y=180)
+Entry(root, textvariable = Address, width=30).place(x= 300, y=190)
+ 
+Button(root,text=" ADD", font='Helvetica 18 bold',bg='blanched almond', command = AddContact, padx=20). place(x= 30, y=260)
+Button(root,text="EDIT", font='Helvetica 18 bold',bg='blanched almond',command = UpdateDetail, padx=20).place(x= 230, y=260)
+Button(root,text="DELETE", font='Helvetica 18 bold',bg='blanched almond',command = Delete_Entry, padx=20).place(x= 30, y=340)
+Button(root,text="DETAILS", font='Helvetica 18 bold',bg='blanched almond', command = VIEW).place(x= 230, y=340)
+Button(root,text="RESET", font='Helvetica 18 bold',bg='blanched almond', command = Select_set).place(x= 30, y=590)
+Button(root,text="SEARCH", font='Helvetica 18 bold',bg='gold', command = search).place(x= 1150, y=100)
+Button(root,text="EXIT", font='Helvetica 24 bold',bg='blanched almond', command = EXIT).place(x= 550, y=590)
+ 
+root.mainloop()
